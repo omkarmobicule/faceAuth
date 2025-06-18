@@ -1,0 +1,30 @@
+pipeline {
+    agent any
+    tools {
+        maven 'Maven 3.13.0'
+    }
+    stages {
+        stage('Checkout') {
+            steps {
+                git branch: 'main', url: 'github.com/omkarmobicule/faceAuth.git'
+            }
+        }
+        stage('Build') {
+            steps {
+                sh 'mvn clean install'
+            }
+        }
+        stage('SonarQube Analysis') {
+            steps {
+                withSonarQubeEnv('SonarQube') {
+                    sh 'mvn sonar:sonar -Dsonar.projectKey=demoproject'
+                }
+            }
+        }
+    }
+    post {
+        success {
+            echo "Build and SonarQube analysis completed successfully."
+        }
+    }
+}
